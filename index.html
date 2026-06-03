@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAILY STOCK OUT RECORD</title>
+<style>
+body{
+    font-family: 'Segoe UI', -apple-system, sans-serif; margin: 0; padding: 60px 20px; color: #ffffff; overflow-x: hidden; min-height: 100vh; position: relative;
+    background: radial-gradient(circle at 10% 20%, rgba(59,130,246,0.35), transparent 22%), radial-gradient(circle at 90% 80%, rgba(6,182,212,0.28), transparent 25%), radial-gradient(circle at 50% 50%, rgba(37,99,235,0.12), transparent 35%), linear-gradient(135deg, #020617 0%, #0b1120 20%, #0f172a 45%, #111827 70%, #020617 100%); background-attachment: fixed;
+}
+.cyber-grid{ position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(circle at center, black 35%, transparent 90%); -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 90%); z-index: -1; }
+.form-container{ max-width: 1050px; margin: auto; padding: 45px; border-radius: 30px; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 25px 70px rgba(0,0,0,0.5), 0 0 45px rgba(59,130,246,0.1); position: relative; }
+.logo-container{ text-align: center; margin-bottom: 25px; }
+.logo-container img{ max-width: 180px; height: auto; background: transparent; }
+.main-title{ text-align: center; font-size: 42px; font-weight: 900; letter-spacing: 2px; background: linear-gradient(135deg, #38bdf8, #2563eb, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 50px; position: relative; }
+.main-title::after{ content: ""; position: absolute; left: 50%; bottom: -16px; transform: translateX(-50%); width: 260px; height: 6px; border-radius: 50px; background: linear-gradient(90deg, #38bdf8, #2563eb, #06b6d4); box-shadow: 0 0 25px rgba(59,130,246,0.5); }
+.section-card { border-radius: 20px; padding: 30px; margin-bottom: 35px; border: 1px solid rgba(255, 255, 255, 0.05); }
+.row{ display: flex; gap: 30px; }
+.form-group{ flex: 1; display: flex; flex-direction: column; margin-bottom: 20px; position: relative; }
+label{ margin-bottom: 12px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+input, select{ width: 100%; padding: 16px 18px; border-radius: 12px; color: #ffffff; font-size: 14px; font-weight: 500; box-sizing: border-box; }
+input[readonly]{ cursor: not-allowed; opacity: 0.7; background: rgba(255, 255, 255, 0.02) !important; }
+option{ background: #0f172a; color: white; }
+
+/* 🔍 ប្រអប់ស្វែងរកផលិតផល */
+.search-wrapper { position: relative; margin-bottom: 10px; }
+.search-input { background: rgba(245, 158, 11, 0.05); border: 1px dashed rgba(245, 158, 11, 0.4); padding: 12px 15px 12px 40px; font-size: 13px; border-radius: 10px; color: #fbbf24; }
+.search-input::placeholder { color: rgba(251, 191, 36, 0.5); }
+.search-icon-inside { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: rgba(251, 191, 36, 0.6); font-size: 14px; }
+
+/* COLOR GROUPS */
+.group-blue { background: rgba(59, 130, 246, 0.05); border-left: 5px solid #3b82f6; }
+.group-blue label { color: #60a5fa; }
+.group-blue input, .group-blue select { background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); }
+.group-amber { background: rgba(245, 158, 11, 0.04); border-left: 5px solid #f59e0b; }
+.group-amber label { color: #fbbf24; }
+.group-amber input, .group-amber select { background: rgba(245, 158, 11, 0.07); border: 1px solid rgba(245, 158, 11, 0.3); }
+.group-green { background: rgba(16, 185, 129, 0.04); border-left: 5px solid #10b981; }
+.group-green label { color: #34d399; }
+.group-green input, .group-green select { background: rgba(16, 185, 129, 0.07); border: 1px solid rgba(16, 185, 129, 0.3); }
+.group-purple { background: rgba(139, 92, 246, 0.04); border-left: 5px solid #8b5cf6; }
+.group-purple label { color: #a78bfa; }
+.group-purple input, .group-purple select { background: rgba(139, 92, 246, 0.07); border: 1px solid rgba(139, 92, 246, 0.3); }
+
+/* ADMIN AREA STYLE */
+.group-admin { display: none; background: rgba(15, 23, 42, 0.85); border-left: 5px solid #f43f5e; margin-top: 50px; }
+.group-admin label { color: #fb7185; }
+.group-admin input, .group-admin select { background: rgba(244, 63, 94, 0.07); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+.btn-submit{ width: 100%; padding: 18px; border: none; border-radius: 18px; background: linear-gradient(135deg, #0ea5e9, #2563eb, #06b6d4); color: white; font-size: 16px; font-weight: 800; letter-spacing: 1px; cursor: pointer; margin-top: 10px; box-shadow: 0 12px 35px rgba(37,99,235,0.35); transition: 0.35s ease; }
+.btn-submit:hover{ transform: translateY(-4px); filter: brightness(1.1); }
+
+.btn-export { width: 100%; padding: 16px; border: none; border-radius: 14px; background: linear-gradient(135deg, #06b6d4, #0891b2, #0284c7); color: white; font-size: 15px; font-weight: 800; letter-spacing: 1px; cursor: pointer; margin-bottom: 25px; box-shadow: 0 6px 20px rgba(6,182,212,0.3); transition: 0.3s; }
+.btn-export:hover { transform: translateY(-2px); filter: brightness(1.1); }
+.btn-add { flex: 1; padding: 15px; border: none; border-radius: 14px; background: linear-gradient(135deg, #10b981, #059669); color: white; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 25px rgba(16,185,129,0.25); transition: 0.3s; }
+.btn-add:hover { transform: translateY(-2px); filter: brightness(1.1); }
+.btn-delete { flex: 1; padding: 15px; border: none; border-radius: 14px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 25px rgba(239,68,68,0.25); transition: 0.3s; }
+.btn-delete:hover { transform: translateY(-2px); filter: brightness(1.1); }
+button:disabled { background: #475569 !important; cursor: not-allowed !important; box-shadow: none !important; transform: none !important; }
+
+.floating-lock-btn { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50%; color: #64748b; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); z-index: 999; }
+.floating-lock-btn:hover { color: #fb7185; border-color: rgba(244, 63, 94, 0.4); }
+
+.success-box { display: none; text-align: center; padding: 40px 20px; }
+.success-icon { font-size: 70px; color: #10b981; margin-bottom: 20px; }
+.success-title { font-size: 32px; font-weight: 800; color: #34d399; margin-bottom: 10px; }
+.btn-reset { padding: 15px 40px; border: 2px solid #2563eb; background: rgba(37, 99, 235, 0.1); color: #60a5fa; font-size: 15px; font-weight: 700; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+.btn-reset:hover { background: #2563eb; color: white; }
+.loading-text { font-size: 13px; color: #38bdf8; font-style: italic; margin-top: 5px; }
+
+@media(max-width:768px){ .row{ flex-direction: column; gap: 20px; } .main-title{ font-size: 28px; } .form-container{ padding: 25px; } }
+</style>
+</head>
+<body>
+
+<div class="cyber-grid"></div>
+
+<button class="floating-lock-btn" onclick="toggleAdminPanel()" title="Admin Panel">🔑</button>
+
+<div class="form-container">
+    <div class="logo-container">
+        <img src="img/logo.png" alt="ONLINE Logo">
+    </div>
+
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {showSuccessPage();}"></iframe>
+
+    <div id="formSection">
+        <h1 class="main-title">DAILY STOCK OUT RECORD</h1>
+
+        <form id="stockForm" action="https://docs.google.com/forms/d/e/1FAIpQLSc2vMOuXx5mltGbaPmV-d-bm7L8Gb6tRS8X3Pi-Kcp4SPWKew/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
+
+            <div class="section-card group-blue">
+                <div class="row">
+                    <div class="form-group">
+                        <label>Date stock out</label>
+                        <input type="date" name="entry.240747870" id="dateStockOut" onchange="calculateMonth()" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Month</label>
+                        <input type="number" name="entry.2080272992" id="monthInput" readonly>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Location Name</label>
+                        <select id="locationSelect" onchange="autoFillLocationCode()" required>
+                            <option value="">-- Select Location --</option>
+                            <option value="ChakAngre Krom - Main Warehouse at Head Office">ChakAngre Krom - Main Warehouse at Head Office</option>
+                            <option value="Department IMO">Department IMO</option>
+                            <option value="Department Network and System">Department Network and System</option>
+                            <option value="Department Technical Support">Department Technical Support</option>
+                            <option value="Office BTB">Office BTB</option>
+                            <option value="Office SRP">Office SRP</option>
+                            <option value="Offce SHV">Offce SHV</option>
+                            <option value="Office Bavet">Office Bavet</option>
+                            <option value="Office Poipet">Office Poipet</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Department Name</label>
+                        <select id="deptSelect" onchange="autoFillDepartmentCode()" required>
+                            <option value="">-- Select Department --</option>
+                            <option value="Installation and Maintenance (IMO)">Installation and Maintenance (IMO)</option>
+                            <option value="Outside-Planning (OSP)">Outside-Planning (OSP)</option>
+                            <option value="Project Planning">Project Planning</option>
+                            <option value="Network and system (IMO)">Network and system (IMO)</option>
+                            <option value="Solution (IMO)">Solution (IMO)</option>
+                            <option value="Accounting & Finance">Accounting & Finance</option>
+                            <option value="Stock">Stock</option>
+                            <option value="Credit Control">Credit Control</option>
+                            <option value="Supply chain">Supply chain</option>
+                            <option value="HR">HR</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Legal">Legal</option>
+                            <option value="Management">Management</option>
+                            <option value="Internal Audit">Internal Audit</option>
+                            <option value="Project development">Project development</option>
+                            <option value="Commercial - sale">Commercial - sale</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="CSV">CSV</option>
+                            <option value="CR">CR</option>
+                            <option value="Call center">Call center</option>
+                            <option value="Billing development">Billing development</option>
+                            <option value="Software development">Software development</option>
+                            <option value="System and Network">System and Network</option>
+                            <option value="Power">Power</option>
+                            <option value="Support & IT">Support & IT</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Location Code</label>
+                        <input type="text" name="entry.1784007688" id="locationCode" readonly required>
+                    </div>
+                    <div class="form-group">
+                        <label>Department Code</label>
+                        <input type="text" name="entry.739448496" id="deptCode" readonly required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card group-amber">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    
+                    <div class="search-wrapper">
+                        <span class="search-icon-inside">🔍</span>
+                        <input type="text" id="productSearchInput" class="search-input" placeholder="វាយទីនេះដើម្បីស្វែងរកឈ្មោះ ឬកូដផលិតផល..." onkeyup="filterProducts()">
+                    </div>
+
+                    <select name="entry.1718200836" id="productSelect" onchange="autoFillCodeAndUOM()" required>
+                        <option value="">🔄 កំពុងទាញយកបញ្ជីផលិតផលពី Google Sheet...</option>
+                    </select>
+                    <div id="loadingStatus" class="loading-text">Connecting to Live database...</div>
+                </div>
+                <div class="row">
+                    <div class="form-group" style="flex:2;">
+                        <label>Code BC MM co.,</label>
+                        <input type="text" name="entry.2001095029" id="codeBC" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>UOM</label>
+                        <input type="text" name="entry.1957731341" id="uomInput" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card group-green">
+                <div class="row">
+                    <div class="form-group">
+                        <label>Serial</label>
+                        <input type="text" name="entry.617330529" id="serialInput">
+                    </div>
+                    <div class="form-group">
+                        <label>Mac serial</label>
+                        <input type="text" name="entry.173083904" id="macInput">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>New/Old/Broken</label>
+                        <select name="entry.341140615" id="statusSelect" required>
+                            <option value="">-- Select Status --</option>
+                            <option value="New">New</option>
+                            <option value="Old">Old</option>
+                            <option value="Broken">Broken</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>QTY</label>
+                        <input type="number" name="entry.2116288745" id="qtyInput" min="1" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card group-purple">
+                <div class="row">
+                    <div class="form-group">
+                        <label>Sold/Free rental</label>
+                        <select name="entry.519894153" id="typeSelect" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="Free rental">Free rental</option>
+                            <option value="Sold">Sold</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Customer's Ticket</label>
+                        <input type="text" name="entry.1296176737" id="ticketInput">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Quotation No.</label>
+                        <input type="text" name="entry.1080710696" id="quoteInput">
+                    </div>
+                    <div class="form-group">
+                        <label>Remark</label>
+                        <input type="text" name="entry.2061896501" id="remarkInput">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">SAVE DATA</button>
+        </form>
+
+        <div class="section-card group-admin" id="adminPanel">
+            <h3 style="margin-top:0; margin-bottom:20px; color:#f43f5e; font-size:18px;">🛠️ ONLINE SYSTEM MANAGER</h3>
+            
+            <button type="button" class="btn-export" id="btnExport" onclick="exportMonthlyReport()">📥 EXPORT MONTHLY SUMMARY REPORT</button>
+
+            <div style="background: rgba(255, 255, 255, 0.02); padding: 20px; border-radius: 14px; margin-bottom: 25px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="color:#e2e8f0;">✨ New Product Name</label>
+                    <input type="text" id="newProdName" placeholder="ឧទហរណ៍៖ Wi-Fi Router Archer C64">
+                </div>
+                <div class="row" style="margin-bottom: 15px;">
+                    <div class="form-group" style="flex:2;">
+                        <label style="color:#e2e8f0;">Code BC MM co.,</label>
+                        <input type="text" id="newProdCode" placeholder="ឧទហរណ៍៖ 2-210099">
+                    </div>
+                    <div class="form-group">
+                        <label style="color:#e2e8f0;">UOM</label>
+                        <input type="text" id="newProdUom" placeholder="Unit / Pcs">
+                    </div>
+                </div>
+                <button type="button" class="btn-add" style="width:100%;" id="btnAddProd" onclick="handleProductAction('add')">➕ ADD NEW PRODUCT</button>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0; position: relative;">
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08);">
+                <span style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #0f172a; padding: 0 15px; color: #64748b; font-size: 12px; font-weight: bold;">OR</span>
+            </div>
+
+            <div style="background: rgba(244, 63, 94, 0.08); padding: 20px; border-radius: 14px; border: 1px solid rgba(244, 63, 94, 0.2);">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="color: #fb7185;">🗑️ ជ្រើសរើសផលិតផលដែលត្រូវលុប (Delete Product)</label>
+                    
+                    <div class="search-wrapper">
+                        <span class="search-icon-inside">🔍</span>
+                        <input type="text" id="adminDeleteSearchInput" class="search-input" placeholder="វាយដើម្បីរកផលិតផលត្រូវលុប..." onkeyup="filterAdminDeleteProducts()">
+                    </div>
+
+                    <select id="adminProductDeleteSelect">
+                        <option value="">-- កំពុងទាញយកបញ្ជីផលិតផល... --</option>
+                    </select>
+                </div>
+                <button type="button" class="btn-delete" style="width:100%;" id="btnDelProd" onclick="handleProductAction('delete')">❌ DELETE SELECTED PRODUCT</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="successSection" class="success-box">
+        <div class="success-icon">✓</div>
+        <div class="success-title">Data Saved Successfully!</div>
+        <div class="success-text">ព័ត៌មានស្តុករបស់អ្នកត្រូវបានកត់ត្រារួចរាល់ហើយ។</div>
+        <button class="btn-reset" onclick="resetAndReturn()">🔄 Input New Data</button>
+    </div>
+</div>
+
+<script>
+var submitted = false;
+let productDatabase = {};
+
+// ⚠️ ជួរដេកទី ៣៣០៖ កុំភ្លេចប្តូរដាក់ Web App URL របស់បងនៅទីនេះឡើងវិញ
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz09AuqFPmUgE3mLMHgCC_JmOFGVwaTHwtBX68-Qavt5FePJhjWuBhhkeWOha0cU-NW/exec";
+const ADMIN_PASSWORD = "1234";
+
+function toggleAdminPanel() {
+    const adminPanel = document.getElementById("adminPanel");
+    if (adminPanel.style.display === "block") { adminPanel.style.display = "none"; return; }
+    
+    const pass = prompt("🔑 សូមបញ្ចូលលេខសម្ងាត់ដើម្បីបើកផ្ទាំងគ្រប់គ្រង៖");
+    if (pass === ADMIN_PASSWORD) {
+        adminPanel.style.display = "block";
+        adminPanel.scrollIntoView({ behavior: 'smooth' });
+    } else if (pass !== null) { alert("❌ លេខសម្ងាត់មិនត្រឹមត្រូវទេ!"); }
+}
+
+function exportMonthlyReport() {
+    const btn = document.getElementById("btnExport");
+    btn.disabled = true;
+    btn.textContent = "⏳ កំពុងគណនា និងបូកសរុបទិន្នន័យប្រចាំខែ...";
+    
+    fetch(APPS_SCRIPT_URL + "?export=true")
+    .then(res => res.json())
+    .then(rows => {
+        if (!rows || rows.length <= 1) { alert("❌ មិនទាន់មានទិន្នន័យសម្រាប់ស្រង់ឡើយ!"); return; }
+        
+        const headers = rows[0];
+        const idxMonth = headers.findIndex(h => h.toString().toLowerCase().includes("month"));
+        const idxCode = headers.findIndex(h => h.toString().toLowerCase().includes("code bc") || h.toString().toLowerCase().includes("codebc") || h.toString().toLowerCase().includes("2001095029"));
+        const idxProdName = headers.findIndex(h => h.toString().toLowerCase().includes("product") || h.toString().toLowerCase().includes("1718200836"));
+        const idxQty = headers.findIndex(h => h.toString().toLowerCase().includes("qty") || h.toString().toLowerCase().includes("2116288745"));
+        
+        if (idxMonth === -1 || idxCode === -1 || idxProdName === -1 || idxQty === -1) {
+            alert("❌ ប្រព័ន្ធរកមិនឃើញជួរឈរ (Month, Code BC, Product Name, QTY) ឡើយ!"); return;
+        }
+
+        let summaryMap = {};
+        for (let i = 1; i < rows.length; i++) {
+            let row = rows[i];
+            let month = row[idxMonth] ? row[idxMonth].toString().trim() : "Unknown";
+            let code = row[idxCode] ? row[idxCode].toString().trim() : "No Code";
+            let prodName = row[idxProdName] ? row[idxProdName].toString().trim() : "No Name";
+            let qty = parseFloat(row[idxQty]) || 0;
+            
+            if (!month || (!code && !prodName)) continue;
+            
+            let key = `${month}|||${code}|||${prodName}`;
+            summaryMap[key] = (summaryMap[key] || 0) + qty;
+        }
+
+        let csvContent = "\uFEFF"; 
+        csvContent += "======= របាយការណ៍សង្ខេបការប្រើប្រាស់ប្រចាំខែ (SUMMARY REPORT) =======\r\n";
+        csvContent += "Month (ខែ),Code BC MM co., (កូដផលិតផល),Product Name (ឈ្មោះផលិតផល),Total QTY (ចំនួនប្រើប្រាស់សរុប)\r\n";
+        
+        let sortedKeys = Object.keys(summaryMap).sort((a, b) => (parseInt(a.split("|||")[0])||0) - (parseInt(b.split("|||")[0])||0));
+        sortedKeys.forEach(key => {
+            let parts = key.split("|||");
+            let safeP = parts[2].includes(",") ? `"${parts[2]}"` : parts[2];
+            let safeC = parts[1].includes(",") ? `"${parts[1]}"` : parts[1];
+            csvContent += `${parts[0]},'${safeC},${safeP},${summaryMap[key]}\r\n`;
+        });
+        
+        csvContent += "\r\n\r\n======= ទិន្នន័យលម្អិតដើមទាំងអស់ (ALL DETAILED RAW DATA) =======\r\n";
+        rows.forEach(row => {
+            csvContent += row.map(val => {
+                let text = val ? val.toString().replace(/"/g, '""') : "";
+                return text.includes(",") || text.includes("\n") ? `"${text}"` : text;
+            }).join(",") + "\r\n";
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Stock_Out_Summary_Report_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        alert("✅ បានទាញយករបាយការណ៍បូកសរុបប្រចាំខែរួចរាល់!");
+    })
+    .catch(err => { alert("❌ មានបញ្ហាក្នុងការទាញទិន្នន័យ៖ " + err); })
+    .finally(() => { btn.disabled = false; btn.textContent = "📥 EXPORT MONTHLY SUMMARY REPORT"; });
+}
+
+function filterProducts() {
+    const keyword = document.getElementById("productSearchInput").value.toLowerCase();
+    const select = document.getElementById("productSelect");
+    
+    select.innerHTML = '<option value="">-- Select Product --</option>';
+    
+    for (const key in productDatabase) {
+        if (productDatabase.hasOwnProperty(key)) {
+            const code = productDatabase[key].code.toLowerCase();
+            const name = key.toLowerCase();
+            
+            if (name.includes(keyword) || code.includes(keyword)) {
+                const opt = document.createElement("option");
+                opt.value = key;
+                opt.textContent = `${key} [${productDatabase[key].code}]`;
+                select.appendChild(opt);
+            }
+        }
+    }
+}
+
+function filterAdminDeleteProducts() {
+    const keyword = document.getElementById("adminDeleteSearchInput").value.toLowerCase();
+    const select = document.getElementById("adminProductDeleteSelect");
+    select.innerHTML = '<option value="">-- ជ្រើសរើសផលិតផលដើម្បីលុប --</option>';
+    
+    for (const key in productDatabase) {
+        if (productDatabase.hasOwnProperty(key)) {
+            if (key.toLowerCase().includes(keyword) || productDatabase[key].code.toLowerCase().includes(keyword)) {
+                const opt = document.createElement("option");
+                opt.value = key; opt.textContent = key;
+                select.appendChild(opt);
+            }
+        }
+    }
+}
+
+function fetchLiveProducts() {
+    if (APPS_SCRIPT_URL === "ដាក់_WEB_APP_URL_របស់លោកអ្នកទីនេះ") {
+        document.getElementById("productSelect").innerHTML = '<option value="">⚠️ សូមកំណត់ APPS_SCRIPT_URL សិន!</option>';
+        document.getElementById("adminProductDeleteSelect").innerHTML = '<option value="">⚠️ សូមកំណត់ APPS_SCRIPT_URL សិន!</option>';
+        return;
+    }
+    fetch(APPS_SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+            productDatabase = data;
+            renderProductDropdowns();
+            document.getElementById("loadingStatus").textContent = "✓ Connected. Live Database Synchronized!";
+            document.getElementById("loadingStatus").style.color = "#10b981";
+        }).catch(err => {
+            document.getElementById("loadingStatus").textContent = "Failed to sync live database.";
+            document.getElementById("loadingStatus").style.color = "#ef4444";
+        });
+}
+
+function renderProductDropdowns() {
+    const productSelect = document.getElementById("productSelect");
+    const adminDeleteSelect = document.getElementById("adminProductDeleteSelect");
+    
+    productSelect.innerHTML = '<option value="">-- Select Product --</option>';
+    adminDeleteSelect.innerHTML = '<option value="">-- ជ្រើសរើសផលិតផលដើម្បីលុប --</option>';
+    
+    for (const key in productDatabase) {
+        if (productDatabase.hasOwnProperty(key)) {
+            const opt1 = document.createElement("option");
+            opt1.value = key; 
+            opt1.textContent = `${key} [${productDatabase[key].code}]`;
+            productSelect.appendChild(opt1);
+            
+            const opt2 = document.createElement("option");
+            opt2.value = key; opt2.textContent = key;
+            adminDeleteSelect.appendChild(opt2);
+        }
+    }
+}
+
+function handleProductAction(actionType) {
+    const btnAdd = document.getElementById("btnAddProd");
+    const btnDel = document.getElementById("btnDelProd");
+    const formData = new URLSearchParams();
+    
+    if (actionType === 'add') {
+        const name = document.getElementById("newProdName").value.trim();
+        const code = document.getElementById("newProdCode").value.trim();
+        const uom = document.getElementById("newProdUom").value.trim();
+        if (!name || !code || !uom) { alert("⚠️ សូមបំពេញព័ត៌មានផលិតផលថ្មីឱ្យបានគ្រប់គ្រាន់!"); return; }
+        
+        btnAdd.disabled = true; if(btnDel) btnDel.disabled = true;
+        btnAdd.textContent = "⏳ កំពុងបញ្ចូល...";
+        formData.append("action", "add"); formData.append("new_name", name); formData.append("new_code", code); formData.append("new_uom", uom);
+        
+    } else if (actionType === 'delete') {
+        const selectedProduct = document.getElementById("adminProductDeleteSelect").value;
+        if (!selectedProduct) { alert("⚠️ សូមជ្រើសរើសផលិតផលជាមុនសិន!"); return; }
+        if (!confirm("⚠️ តើអ្នកប្រាកដជាចង់លុបផលិតផល '" + selectedProduct + "' នេះមែនទេ?")) { return; }
+        
+        btnAdd.disabled = true; btnDel.disabled = true; btnDel.textContent = "⏳ កំពុងលុប...";
+        formData.append("action", "delete"); formData.append("delete_name", selectedProduct);
+    }
+
+    fetch(APPS_SCRIPT_URL, { method: "POST", body: formData, headers: { "Content-Type": "application/x-www-form-urlencoded" } })
+    .then(res => res.text())
+    .then(textData => {
+        const resData = JSON.parse(textData);
+        if (resData.status === "success") {
+            if (actionType === 'add') {
+                alert("✅ បានបន្ថែមផលិតផលថ្មីដោយជោគជ័យ!");
+                document.getElementById("newProdName").value = ""; document.getElementById("newProdCode").value = ""; document.getElementById("newProdUom").value = "";
+            } else {
+                alert("🗑️ បានលុបផលិតផលរួចរាល់!");
+                document.getElementById("productSelect").value = ""; document.getElementById("codeBC").value = ""; document.getElementById("uomInput").value = "";
+            }
+            document.getElementById("productSearchInput").value = "";
+            document.getElementById("adminDeleteSearchInput").value = "";
+            fetchLiveProducts();
+        } else { alert(resData.message); }
+    })
+    .catch(err => { alert("❌ មានបញ្ហាប្រព័ន្ធតភ្ជាប់!"); })
+    .finally(() => { btnAdd.disabled = false; if(btnDel) btnDel.disabled = false; btnAdd.textContent = "➕ ADD NEW PRODUCT"; if(btnDel) btnDel.textContent = "❌ DELETE SELECTED PRODUCT"; });
+}
+
+function autoFillCodeAndUOM(){
+    const sel = document.getElementById("productSelect").value;
+    document.getElementById("codeBC").value = productDatabase[sel] ? productDatabase[sel].code : "";
+    document.getElementById("uomInput").value = productDatabase[sel] ? productDatabase[sel].uom : "";
+}
+
+const locationDatabase = { "ChakAngre Krom - Main Warehouse at Head Office": "C_KROM", "Department IMO": "DEP-IMO", "Department Network and System": "DEP-SYS", "Department Technical Support": "DEP-TDS", "Office BTB": "Office -BTB", "Office SRP": "Office -SRP", "Offce SHV": "Office -SHV", "Office Bavet": "Office -BVT", "Office Poipet": "Office -PPT" };
+const departmentDatabase = { "Installation and Maintenance (IMO)": "010", "Outside-Planning (OSP)": "020", "Project Planning": "030", "Network and system (IMO)": "040", "Solution (IMO)": "050", "Accounting & Finance": "110", "Stock": "120", "Credit Control": "130", "Supply chain": "220", "HR": "310", "Admin": "320", "Legal": "330", "Management": "340", "Internal Audit": "410", "Project development": "510", "Commercial - sale": "520", "Marketing": "530", "CSV": "710", "CR": "720", "Call center": "730", "Billing development": "810", "Software development": "820", "System and Network": "920", "Power": "930", "Support & IT": "910" };
+
+function autoFillLocationCode() { document.getElementById("locationCode").value = locationDatabase[document.getElementById("locationSelect").value] || ""; }
+function autoFillDepartmentCode() { document.getElementById("deptCode").value = departmentDatabase[document.getElementById("deptSelect").value] || ""; }
+function calculateMonth(){ const val = document.getElementById("dateStockOut").value; if(val){ document.getElementById("monthInput").value = new Date(val).getMonth() + 1; } }
+function showSuccessPage() { document.getElementById("formSection").style.display = "none"; document.getElementById("successSection").style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function resetAndReturn() { document.getElementById("stockForm").reset(); submitted = false; document.getElementById("successSection").style.display = "none"; document.getElementById("formSection").style.display = "block"; document.getElementById("productSearchInput").value = ""; fetchLiveProducts(); }
+
+window.onload = fetchLiveProducts;
+</script>
+</body>
+</html>
