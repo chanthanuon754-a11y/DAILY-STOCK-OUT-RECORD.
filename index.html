@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DAILY STOCK OUT</title>
-<link class="js-meta-tag" rel="icon" href="https://chanthanuon754-a11y.github.io/DAILY-STOCK-OUT-RECORD./img/logo.png" />
+<link rel="icon" href="https://chanthanuon754-a11y.github.io/DAILY-STOCK-OUT-RECORD./img/logo.png" />
     
 <style>
 body{
@@ -85,12 +85,13 @@ button:disabled { background: #475569 !important; cursor: not-allowed !important
         <img src="https://chanthanuon754-a11y.github.io/DAILY-STOCK-OUT-RECORD./img/logo.png" alt="ONLINE Logo" onerror="this.src='img/logo.png'">
     </div>
 
+    <!-- Hidden Iframe to receive Google Form submit response -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {showSuccessPage();}"></iframe>
 
     <div id="formSection">
         <h1 class="main-title">DAILY STOCK OUT RECORD</h1>
 
-        <form id="stockForm" action="https://docs.google.com/forms/d/e/1FAIpQLSc2vMOuXx5mltGbaPmV-d-bm7L8Gb6tRS8X3Pi-Kcp4SPWKew/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true; sendTelegramMessage();">
+        <form id="stockForm" action="https://docs.google.com/forms/d/e/1FAIpQLSc2vMOuXx5mltGbaPmV-d-bm7L8Gb6tRS8X3Pi-Kcp4SPWKew/formResponse" method="POST" target="hidden_iframe" onsubmit="return handleFormSubmit();">
 
             <div class="section-card group-blue">
                 <!-- 🆕 ប្រអប់ជ្រើសរើស Name Team -->
@@ -261,7 +262,7 @@ button:disabled { background: #475569 !important; cursor: not-allowed !important
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit">SAVE DATA</button>
+            <button type="submit" id="btnSubmitForm" class="btn-submit">SAVE DATA</button>
         </form>
 
         <div class="section-card group-admin" id="adminPanel">
@@ -313,7 +314,7 @@ button:disabled { background: #475569 !important; cursor: not-allowed !important
     <div id="successSection" class="success-box">
         <div class="success-icon">✓</div>
         <div class="success-title">Data Saved Successfully!</div>
-        <div class="success-text">ព័ត៌មានស្តុករបស់អ្នកត្រូវបានកត់ត្រារួចរាល់ហើយ។</div>
+        <div class="success-text">ព័ត៌មានស្តុករបស់អ្នកត្រូវបានកត់ត្រារួចរាល់ហើយ និងបានផ្ញើទៅកាន់គ្រុប Telegram។</div>
         <button class="btn-reset" onclick="resetAndReturn()">🔄 Input New Data</button>
     </div>
 </div>
@@ -325,9 +326,9 @@ let productDatabase = {};
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz09AuqFPmUgE3mLMHgCC_JmOFGVwaTHwtBX68-Qavt5FePJhjWuBhhkeWOha0cU-NW/exec";
 const ADMIN_PASSWORD = "1234";
 
-// 📡 ទិន្នន័យ Telegram ពិតប្រាកដរបស់បង ត្រូវបានកំណត់ចូលប្រព័ន្ធរួចរាល់ជាមួយ ID Supergroup ថ្មី
+// 📡 កំណត់ព័ត៌មាន Telegram របស់បងយ៉ាងត្រឹមត្រូវ
 const TELEGRAM_BOT_TOKEN = "8758001195:AAFs0wfRQMCjCDa5kdu7kHyxvYpJnPHfaA4";
-const TELEGRAM_CHAT_ID = "-1003971701236"; // 👈 កែសម្រួលដាក់លេខ ID Supergroup ថ្មីរួចរាល់
+const TELEGRAM_CHAT_ID = "-1003971701236";
 
 function toggleAdminPanel() {
     const adminPanel = document.getElementById("adminPanel");
@@ -536,15 +537,11 @@ function autoFillLocationCode() { document.getElementById("locationCode").value 
 function autoFillDepartmentCode() { document.getElementById("deptCode").value = departmentDatabase[document.getElementById("deptSelect").value] || ""; }
 function calculateMonth(){ const val = document.getElementById("dateStockOut").value; if(val){ document.getElementById("monthInput").value = new Date(val).getMonth() + 1; } }
 function showSuccessPage() { document.getElementById("formSection").style.display = "none"; document.getElementById("successSection").style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-function resetAndReturn() { document.getElementById("stockForm").reset(); submitted = false; document.getElementById("successSection").style.display = "none"; document.getElementById("formSection").style.display = "block"; document.getElementById("productSearchInput").value = ""; fetchLiveProducts(); }
+function resetAndReturn() { document.getElementById("stockForm").reset(); submitted = false; document.getElementById("successSection").style.display = "none"; document.getElementById("formSection").style.display = "block"; document.getElementById("productSearchInput").value = ""; document.getElementById("btnSubmitForm").disabled = false; document.getElementById("btnSubmitForm").textContent = "SAVE DATA"; fetchLiveProducts(); }
 
-// 🆕 អនុគមន៍បញ្ជូនទិន្នន័យស្រង់យកតែចំណុចសំខាន់ៗផ្ញើទៅកាន់ Telegram Bot
-function sendTelegramMessage() {
-    if (typeof TELEGRAM_BOT_TOKEN === 'undefined' || typeof TELEGRAM_CHAT_ID === 'undefined' || !TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-        console.warn("⚠️ Telegram bot token or chat ID is missing or not declared.");
-        return;
-    }
-
+// 🆕 អនុគមន៍បញ្ជូនទិន្នន័យជាកញ្ចប់ទៅកាន់ Telegram Bot ដោយបង្ការការរអាក់រអួល
+async function sendTelegramMessage() {
+    console.log("Preparing to send Telegram message...");
     const nameTeam = document.getElementById("nameTeam").value;
     const dateStockOut = document.getElementById("dateStockOut").value;
     const productName = document.getElementById("productSelect").value;
@@ -555,7 +552,6 @@ function sendTelegramMessage() {
     const ticket = document.getElementById("ticketInput").value || "N/A";
     const remark = document.getElementById("remarkInput").value || "N/A";
 
-    // រៀបចំជាសារទម្រង់ស្អាត (HTML style)
     const message = `📦 <b>DAILY STOCK OUT RECORD</b> 📦\n\n` +
                     `👤 <b>Name Team:</b> ${nameTeam}\n` +
                     `📅 <b>Date stock out:</b> ${dateStockOut}\n` +
@@ -568,25 +564,42 @@ function sendTelegramMessage() {
 
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
     
-    fetch(url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message,
-            parse_mode: "HTML"
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            console.error("Telegram API Response Error:", response.statusText);
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: "HTML"
+            })
+        });
+        
+        if (response.ok) {
+            console.log("✅ Telegram message sent successfully.");
+        } else {
+            const errText = await response.text();
+            console.error("❌ Telegram API responded with error:", errText);
         }
-    })
-    .catch(err => {
-        console.error("Telegram Network Error:", err);
-    });
+    } catch (err) {
+        console.error("❌ Network error sending Telegram message:", err);
+    }
+}
+
+// 🆕 គ្រប់គ្រងការ Submit ដើម្បីធានាដំណើរការទាំងពីរបានជោគជ័យ
+async function handleFormSubmit() {
+    const btnSubmit = document.getElementById("btnSubmitForm");
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "⏳ SAVING & SENDING...";
+    
+    // ១. ផ្ញើទៅកាន់ Telegram រង់ចាំឲ្យរួចរាល់សិន
+    await sendTelegramMessage();
+    
+    // ២. បញ្ជូនទៅកាន់ Google Form ធម្មតា
+    submitted = true;
+    return true; // អនុញ្ញាតឲ្យ Form submit ទៅកាន់ Hidden Iframe
 }
 
 window.onload = fetchLiveProducts;
