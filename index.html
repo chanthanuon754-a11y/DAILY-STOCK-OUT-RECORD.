@@ -539,31 +539,72 @@ function calculateMonth(){ const val = document.getElementById("dateStockOut").v
 function showSuccessPage() { document.getElementById("formSection").style.display = "none"; document.getElementById("successSection").style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' }); }
 function resetAndReturn() { document.getElementById("stockForm").reset(); submitted = false; document.getElementById("successSection").style.display = "none"; document.getElementById("formSection").style.display = "block"; document.getElementById("productSearchInput").value = ""; document.getElementById("btnSubmitForm").disabled = false; document.getElementById("btnSubmitForm").textContent = "SAVE DATA"; fetchLiveProducts(); }
 
-// 🆕 អនុគមន៍បញ្ជូនទិន្នន័យជាកញ្ចប់ទៅកាន់ Telegram Bot ដោយបង្ការការរអាក់រអួល
+// 🔹 អនុគមន៍ជំនួយសម្រាប់ការពារការបែកកូដ HTML (HTML Escape)
+function escapeHTML(str) {
+    if (!str) return "N/A";
+    return str.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+// 🆕 អនុគមន៍បញ្ជូនទិន្នន័យជាកញ្ចប់ទៅកាន់ Telegram Bot (ទម្រង់ Web UI Dashboard ពិតប្រាកដ)
 async function sendTelegramMessage() {
     console.log("Preparing to send Telegram message...");
-    const nameTeam = document.getElementById("nameTeam").value;
-    const dateStockOut = document.getElementById("dateStockOut").value;
-    const productName = document.getElementById("productSelect").value;
-    const serial = document.getElementById("serialInput").value || "N/A";
-    const macSerial = document.getElementById("macInput").value || "N/A";
-    const status = document.getElementById("statusSelect").value;
-    const qty = document.getElementById("qtyInput").value;
-    const ticket = document.getElementById("ticketInput").value || "N/A";
-    const remark = document.getElementById("remarkInput").value || "N/A";
-
-    const message = `📦 <b>DAILY STOCK OUT RECORD</b> 📦\n\n` +
-                    `👤 <b>Name Team:</b> ${nameTeam}\n` +
-                    `📅 <b>Date stock out:</b> ${dateStockOut}\n` +
-                    `🏷️ <b>Product Name:</b> ${productName}\n` +
-                    `🔢 <b>Serial:</b> ${serial}\n` +
-                    `🌐 <b>Mac serial:</b> ${macSerial}\n` +
-                    `📊 <b>QTY-New/Old/Broken:</b> ${qty} (${status})\n` +
-                    `🎫 <b>Customer's Ticket:</b> ${ticket}\n` +
-                    `📝 <b>Remark:</b> ${remark}`;
-
-    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
     
+    // ទាញយកតម្លៃ និងធ្វើការ Escape ការពារការបែក Layout
+    const nameTeam = escapeHTML(document.getElementById("nameTeam").value);
+    const dateStockOut = escapeHTML(document.getElementById("dateStockOut").value);
+    const productName = escapeHTML(document.getElementById("productSelect").value);
+    const serial = escapeHTML(document.getElementById("serialInput").value);
+    const macSerial = escapeHTML(document.getElementById("macInput").value);
+    const status = document.getElementById("statusSelect").value;
+    const qty = escapeHTML(document.getElementById("qtyInput").value);
+    const ticket = escapeHTML(document.getElementById("ticketInput").value);
+    const remark = escapeHTML(document.getElementById("remarkInput").value);
+
+    // បង្កើត Status Badge បែប UI Website មានពណ៌រស់រវើក
+    let statusBadge = "🟢 NEW";
+    if (status.toLowerCase().includes("broken")) statusBadge = "🔴 BROKEN";
+    if (status.toLowerCase().includes("old")) statusBadge = "🟡 OLD";
+
+    // ១. រៀបចំ Layout អក្សរឱ្យត្រង់ជួរគ្នាស្អាតបេះបិទ ដូច Web Dashboard
+    let captionMessage = "🌐 <b>SYSTEM: STOCK OUT RECORD</b>\n";
+    captionMessage += "━━━━━━━━━━━━━━━━━━━━\n\n";
+    
+    captionMessage += "👤 <b>STAFF INFO</b>\n";
+    captionMessage += "<code>• Team Name : " + nameTeam + "</code>\n";
+    captionMessage += "<code>• Date      : " + dateStockOut + "</code>\n\n";
+    
+    captionMessage += "📦 <b>PRODUCT DETAILS</b>\n";
+    captionMessage += "<code>• Item Name : " + productName + "</code>\n";
+    captionMessage += "<code>• Qty/Status: " + qty + " Unit (" + statusBadge + ")</code>\n\n";
+    
+    captionMessage += "🔍 <b>HARDWARE IDENTIFIER</b>\n";
+    captionMessage += "<code>• Serial    : " + serial + "</code>\n";
+    captionMessage += "<code>• MAC       : " + macSerial + "</code>\n\n";
+    
+    captionMessage += "🎫 <b>REFERENCE & REMARK</b>\n";
+    captionMessage += "<code>• Ticket ID : #" + ticket + "</code>\n";
+    captionMessage += "<code>• Remark    : " + remark + "</code>\n\n";
+    
+    captionMessage += "━━━━━━━━━━━━━━━━━━━━\n";
+    captionMessage += "⚡ <i>Status: Processed Automatically</i>";
+
+    // ២. បង្កើតប៊ូតុងប្រភេទ Inline ដែលមានទាំង Link ធម្មតា និងលក្ខណៈ WebApp (បើកផ្ទាំងដូច App លើទូរស័ព្ទ)
+    const inlineKeyboard = {
+        inline_keyboard: [
+            [
+                { 
+                    text: "📊 ពិនិត្យមើលលើ Google Sheet", 
+                    url: "https://docs.google.com/spreadsheets/d/1MfqFSzxojA1nQOGIMOrU_XNEFd2yJzqiAccC1d9ZhHg/edit?gid=2024782254#gid=2024782254" 
+                }
+            ]
+        ]
+    };
+
+    const url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage";
+
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -572,13 +613,15 @@ async function sendTelegramMessage() {
             },
             body: JSON.stringify({
                 chat_id: TELEGRAM_CHAT_ID,
-                text: message,
-                parse_mode: "HTML"
+                text: captionMessage,
+                parse_mode: "HTML",
+                reply_markup: inlineKeyboard,
+                disable_web_page_preview: true // បិទការទាញ Preview ចេញពី Google Sheet មកបាំងសារ
             })
         });
         
         if (response.ok) {
-            console.log("✅ Telegram message sent successfully.");
+            console.log("✅ Telegram Web-style message sent successfully.");
         } else {
             const errText = await response.text();
             console.error("❌ Telegram API responded with error:", errText);
@@ -587,7 +630,6 @@ async function sendTelegramMessage() {
         console.error("❌ Network error sending Telegram message:", err);
     }
 }
-
 // 🆕 គ្រប់គ្រងការ Submit ដើម្បីធានាដំណើរការទាំងពីរបានជោគជ័យ
 async function handleFormSubmit() {
     const btnSubmit = document.getElementById("btnSubmitForm");
